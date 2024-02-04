@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Image</title>
+</head>
+<body>
+    <h1>Upload Image</h1>
+ 
+    <script>
+        // Define the submitForm function first
+        const submitForm_cartoon = async () => {
+            console.log('Form submission detected');
+            const image_cartoon = document.getElementById('image_cartoon');
+            const formData = new FormData();
+            formData.append('image_cartoon', image_cartoon.files[0]);
+            const start = performance.now(); // Start the timer
+            const response = await fetch('http://127.0.0.1:8080/cartoonize', { method: 'POST', body: formData });
+            const imageUrl = await response.text();
+            const end = performance.now(); // End the timer
+            console.log(`Image load time: ${end - start} ms`); // Log the time it took for the image to load
+            const imageElement_cartoon = document.getElementById('cartoonizedImage_cartoon');
+            imageElement_cartoon.src = imageUrl;
+            imageElement_cartoon.style.display = 'block';
+            console.log('imageElement_cartoon :>> ', imageElement_cartoon);
+
+            const observer = new MutationObserver((mutationsList, observer) => {
+                for(let mutation of mutationsList) {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'src') {
+                        console.log(`The src attribute of the img element was modified. New value: ${imageElement_cartoon.src}`);
+                    }
+                }
+            });
+            
+            // Start observing the img element for configuration changes
+            observer.observe(imageElement_cartoon, { attributes: true });
+        };
+
+        // Now create the HTML elements
+        let imageInput_cartoon = document.createElement('input');
+        imageInput_cartoon.type = 'file';
+        imageInput_cartoon.id = 'image_cartoon';
+        imageInput_cartoon.name = 'image_cartoon';
+        imageInput_cartoon.accept = 'image/*';
+
+        // Create the button element
+        let uploadButton_cartoon = document.createElement('button');
+        uploadButton_cartoon.type = 'button';
+        uploadButton_cartoon.innerHTML = 'Upload';
+        uploadButton_cartoon.addEventListener('click', submitForm_cartoon);
+
+        // Create the img element
+        let cartoonizedImage_cartoon = document.createElement('img');
+        cartoonizedImage_cartoon.id = 'cartoonizedImage_cartoon';
+        cartoonizedImage_cartoon.alt = 'Cartoonized Image';
+        cartoonizedImage_cartoon.style.display = 'none';
+
+        // Append the elements to the body
+        document.body.appendChild(imageInput_cartoon);
+        document.body.appendChild(uploadButton_cartoon);
+        document.body.appendChild(cartoonizedImage_cartoon);
+    </script>
+</body>
+</html>
